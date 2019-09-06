@@ -1,0 +1,25 @@
+{
+  "name": "structured-data-lint",
+  "description": "Terrible wrapper for https://tech.yandex.com/validator/ application/ld+json linter.",
+  "version": "1.0.0",
+  "author": "Peter deHaan <peter@deseloper.com> (https://about.me/peterdehaan)",
+  "bugs": {
+    "url": "https://github.com/pdehaan/structured-data-lint/issues"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "dotenv": "^8.1.0",
+    "glob": "^7.1.4"
+  },
+  "homepage": "https://github.com/pdehaan/structured-data-lint#readme",
+  "keywords": [],
+  "license": "MPL-2.0",
+  "main": "cli.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pdehaan/structured-data-lint.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
