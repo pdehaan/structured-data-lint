@@ -2,6 +2,8 @@ const fs = require("fs");
 
 const axios = require("axios");
 const glob = require("glob").sync;
+const _get = require("lodash.get");
+const sanitizeHtml = require("sanitize-html");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -9,9 +11,6 @@ dotenv.config();
 module.exports = {
   lint
 };
-
-// Ref https://medium.com/javascript-inside/safely-accessing-deeply-nested-values-in-javascript-99bf72a0855a
-const get = (p, o) => p.reduce((xs, x) => (xs && xs[x] ? xs[x] : null), o);
 
 /**
  *
@@ -27,34 +26,38 @@ async function lint(g, args = {}) {
         results.push(res);
       }
     } catch (err) {
-      console.error(err.message);
-      process.exitCode = 2;
+      err.exitCode = 2;
+      return Promise.reject(err);
     }
   }
   if (results.length) {
-    console.log(JSON.stringify(results, null, 2));
-    process.exitCode = 1;
+    const err = new Error(`Found ${results.length} errors`);
+    err.exitCode = 1;
+    err.results = results;
+    return Promise.reject(err);
   }
+  return Promise.resolve([]);
 }
 
 /**
  *
  * @param {string} file The JSON file to upload to the linter.
- * @param {int} wait How long to pause after each call.
+ * @param {int} wait How long to pause after each call (in milliseconds).
  */
-async function lintFile(file, args = {}, wait = 500) {
+async function lintFile(file, args = {}, wait = 500 /*ms*/) {
   const body = await loadFile(file);
   const uri = getParserUri(args);
   const headers = { "Content-Type": "text/plain" };
   const { data } = await axios.post(uri, body, { headers });
   let errors;
   if (data.hasOwnProperty("data")) {
-    errors = get(["json-ld", 0, "#error"], data.data).map(error =>
-      Object.entries(error).reduce(
+    errors = _get(data.data, "json-ld[0].#error").map(error => {
+      error["#message"] = stripHtml(error["#message"]);
+      return Object.entries(error).reduce(
         (obj, [key, value]) => Object.assign(obj, { [prettyKey(key)]: value }),
         {}
-      )
-    );
+      );
+    });
   }
   await sleep(wait);
   return { file, errors };
@@ -90,7 +93,7 @@ function getParserUri(
 }
 
 /**
- * Strip any leading "#" from a key name.
+ * Strip any leading "#" from an object's key's name.
  * @param {string} key
  */
 function prettyKey(key) {
@@ -111,4 +114,8 @@ function loadFile(file) {
  */
 async function sleep(ms = 1500) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function stripHtml(str, allowedTags = []) {
+  return sanitizeHtml(str, { allowedTags });
 }
