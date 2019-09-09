@@ -3,6 +3,7 @@
   "description": "Terrible wrapper for https://tech.yandex.com/validator/ application/ld+json linter.",
   "version": "1.0.0",
   "author": "Peter deHaan <peter@deseloper.com> (https://about.me/peterdehaan)",
+  "bin": "./cli.js",
   "bugs": {
     "url": "https://github.com/pdehaan/structured-data-lint/issues"
   },
