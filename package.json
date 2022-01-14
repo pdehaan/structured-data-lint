@@ -8,7 +8,7 @@
     "url": "https://github.com/pdehaan/structured-data-lint/issues"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "dotenv": "^8.1.0",
     "glob": "^7.1.4",
     "lodash.get": "^4.4.2",
